@@ -1,0 +1,30 @@
+{
+  "name": "mcpeval",
+  "version": "1.0.0",
+  "description": "A Node.js TypeScript project with OpenAI SDK",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "demo": "ts-node src/demo.ts",
+    "salesforce-demo": "ts-node src/salesforce-example.ts",
+    "advanced-demo": "ts-node src/advanced-example.ts",
+    "streaming-test": "ts-node src/test-streaming.ts",
+    "streaming-demo": "ts-node src/streaming-example.ts",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["typescript", "nodejs", "openai"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "openai": "^4.28.0",
+    "@anthropic-ai/sdk": "^0.24.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.0"
+  }
+}
