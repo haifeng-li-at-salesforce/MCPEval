@@ -21,20 +21,23 @@ A comprehensive TypeScript framework for runtime model switching across differen
 Create a `.env` file with your API keys:
 
 ```bash
-# OpenAI
-OPENAI_API_KEY=your_openai_api_key_here
+# Salesforce API Configuration (using OPENAI prefix)
+OPENAI_API_KEY=your_salesforce_api_key_here
+OPENAI_TENANT_ID=your_tenant_id_here
+OPENAI_BASE_URL=https://test.api.salesforce.com
+OPENAI_FEATURE_ID=EinsteinForDevelopers
+OPENAI_MODEL=llmgateway__OpenAIGPT5
 
-# Salesforce Einstein
-SF_API_KEY=your_salesforce_api_key_here
-
-# Anthropic Claude
+# Anthropic Claude (optional)
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
-# Default configurations
+# Default configurations (optional)
 DEFAULT_ENDPOINT=openai
 DEFAULT_MODEL=gpt-3.5-turbo
 SELECTED_MODEL=gpt-4o
 ```
+
+**Note:** Copy `.env.example` to `.env` and update with your actual credentials.
 
 ### 2. Basic Usage
 
