@@ -1,6 +1,12 @@
 // Example: How to implement model switching for Salesforce API (SF_API_URL)
 // This is a hypothetical implementation showing the pattern
 
+
+import * as dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
 export interface ModelConfiguration {
   model: string;
   apiKey: string;
