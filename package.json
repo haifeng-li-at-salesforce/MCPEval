@@ -13,6 +13,9 @@
     "streaming-test": "ts-node src/test-streaming.ts",
     "streaming-demo": "ts-node src/streaming-example.ts",
     "openai-streaming-test": "ts-node src/test-openai-streaming.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
     "watch": "tsc --watch",
     "clean": "rm -rf dist"
   },
@@ -30,7 +33,9 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "@vitest/ui": "^3.2.4",
     "ts-node": "^10.9.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "vitest": "^3.2.4"
   }
 }

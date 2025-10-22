@@ -48,7 +48,7 @@ XGEN_BASE_URL=https://test.api.salesforce.com/einstein/gpt/code/v1.1
 The library provides pre-configured model settings in `model-configs.ts`:
 
 ```typescript
-import { OPENAI_GPT5_CONFIG, QWEN_CONFIG } from './model-configs';
+import { OPENAI_GPT5_CONFIG, QWEN_CONFIG } from './model/model-configs';
 
 // OpenAI GPT-5 Configuration
 const openAIConfig = OPENAI_GPT5_CONFIG;
@@ -60,7 +60,7 @@ const qwenConfig = QWEN_CONFIG;
 You can also create custom configurations:
 
 ```typescript
-import { ModelConfiguration } from './model-configs';
+import { ModelConfiguration } from './model/model-configs';
 
 const customConfig: ModelConfiguration = {
   model: 'your_model_name',
@@ -79,8 +79,8 @@ const customConfig: ModelConfiguration = {
 ### Basic Example
 
 ```typescript
-import { OpenAIStreamingWebClient } from './streaming-client';
-import { OPENAI_GPT5_CONFIG } from './model-configs';
+import { OpenAIStreamingWebClient } from './model/streaming-client';
+import { OPENAI_GPT5_CONFIG } from './model/model-configs';
 
 const client = new OpenAIStreamingWebClient(OPENAI_GPT5_CONFIG);
 
@@ -105,9 +105,9 @@ await client.chat([
 ### Advanced Example with Event Handlers
 
 ```typescript
-import { OpenAIStreamingWebClient } from './streaming-client';
-import { QWEN_CONFIG } from './model-configs';
-import { EventResponse } from './streaming-request';
+import { OpenAIStreamingWebClient } from './model/streaming-client';
+import { QWEN_CONFIG } from './model/model-configs';
+import { EventResponse } from './model/streaming-request';
 
 const client = new OpenAIStreamingWebClient(QWEN_CONFIG);
 
@@ -335,8 +335,8 @@ interface EventResponse {
 Run the included test function:
 
 ```typescript
-import { testStreamingClient } from './streaming-client';
-import { OPENAI_GPT5_CONFIG } from './model-configs';
+import { testStreamingClient } from './model/streaming-client';
+import { OPENAI_GPT5_CONFIG } from './model/model-configs';
 
 // Test the streaming client
 await testStreamingClient(OPENAI_GPT5_CONFIG);

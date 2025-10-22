@@ -1,11 +1,13 @@
 // OpenAIStreamingWebClient for Salesforce API with SSE support
 import { EventEmitter } from 'events';
 import { ModelMessage, RequestBody, EventResponse, DoneResponse } from './streaming-request';
-
-import { ModelConfiguration, OPENAI_GPT5_CONFIG, QWEN_CONFIG } from './model-configs';
+import { Response } from './streaming-response';
+import { ModelConfiguration, OPENAI_GPT5_CONFIG, QWEN_CONFIG, modelConfigs, EinsteinDevModel } from '../model/model-configs';
 import { OpenAI } from 'openai';
 import { Stream } from 'openai/streaming';
 import * as dotenv from 'dotenv';
+import { ModelClient } from './model-client';
+
 
 // Load environment variables
 dotenv.config();
@@ -34,7 +36,7 @@ function isDoneResponse(chunk: unknown): chunk is DoneResponse {
 
 
 
-export class OpenAIStreamingWebClient extends EventEmitter {
+export class OpenAIStreamingClient extends EventEmitter {
   private baseUrl: string;
   private model: string;
   private openai: OpenAI;
@@ -140,11 +142,41 @@ export class OpenAIStreamingWebClient extends EventEmitter {
     } else if (isDoneResponse(chunk)) {
       this.emit('end');
     }else {
-      console.warn('Received non-EventResponse chunk:', chunk);
+      //console.warn('Received non-EventResponse chunk:', chunk);
     }
   }
 }
 
+export class EinsteinDevModelClient extends ModelClient {
+  private config: ModelConfiguration;
+  constructor(model: EinsteinDevModel) {
+    super();
+    this.config = modelConfigs[model];
+  }
+  async chat(systemPrompt: string, userPrompt: string): Promise<Response> {
+    const client = new OpenAIStreamingClient(this.config);
+    let fullResponse = '';
+    let error: Error | null = null;
+    try {
+      await client.chat([{role: 'system', content: systemPrompt}, {role: 'user', content: userPrompt}],{
+        maxTokens: 2048,
+        onContent: (content: string) => {
+          fullResponse += content;
+        },
+        onError: (error: Error) => {
+          error = error;
+        }
+      });
+    }catch (error) {
+      error = error instanceof Error ? error : new Error(String(error));
+    }
+
+    if (error != null) {
+      return { error: error, response: null };
+    } 
+    return { error: null, response: fullResponse };
+  }
+}
 
 
  
@@ -152,7 +184,7 @@ export class OpenAIStreamingWebClient extends EventEmitter {
 
 // Example usage and testing
 export async function testStreamingClient(config: ModelConfiguration) {
-  const client = new OpenAIStreamingWebClient(config);
+  const client = new OpenAIStreamingClient(config);
 
   console.log('🚀 Testing OpenAIStreamingWebClient...\n');
   console.log('🤖 Model: ', config.model);
@@ -190,4 +222,5 @@ export async function testStreamingClient(config: ModelConfiguration) {
 }
 
 // Export for use in other files
-export default OpenAIStreamingWebClient;
+export default OpenAIStreamingClient;
+

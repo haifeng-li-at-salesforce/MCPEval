@@ -7,6 +7,23 @@ import * as dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
+export enum EinsteinDevModel {
+  GPT5 = 'GPT5',
+  XGEN = 'XGEN',
+}
+
+export enum LLMExpressModel {
+  GEMINI_2_5_PRO = 'gemini-2.5-pro',
+  GEMINI_2_5_FLASH = 'gemini-2.5-flash',
+  CLAUDE_3_7_SONNET = 'claude-3-7-sonnet-20250219',
+  CLAUDE_4_SONNET = 'claude-sonnet-4-20250514',
+  GPT_5 = 'gpt-5',
+  GPT_5_MINI = 'gpt-5-mini',
+  GPT_4O = 'gpt-4o',
+  GPT_4O_MINI = 'gpt-4o-mini',
+}
+
+
 export interface ModelConfiguration {
   model: string;
   apiKey: string;
@@ -40,7 +57,10 @@ export const QWEN_CONFIG: ModelConfiguration = {
   parameters: {"command_source": "Chat"}
 };
 
-
+export const modelConfigs: Record<EinsteinDevModel, ModelConfiguration> = {
+  [EinsteinDevModel.GPT5]: OPENAI_GPT5_CONFIG,
+  [EinsteinDevModel.XGEN]: QWEN_CONFIG,
+}
 
 
 
