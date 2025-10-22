@@ -1,54 +1,52 @@
 {
-    "records": [
-        {
-            
-            "name": "sfmobile-web-barcode-scanner",
-            "query": "As a junior developer, you are tasked with implementing a feature in a Salesforce Lightning Web Component (LWC) that utilizes the `BarcodeScanner` API to allow the user to scan a product barcode. Upon scanning a barcode, the app should display the barcode type and value on the screen. Ensure that the barcode scanner only scans for QR codes and EAN-13 barcodes, and provide a user-friendly message if the scanner is not available."
-        },  
-        {
-            "name": "sfmobile-web-location",
-            "query": "Develop a Lightning Web Component (LWC) for an iOS app that allows users to track their movement by logging their location at regular intervals. Use the LocationService to periodically get the user's geolocation with high accuracy. Implement a feature that stores logged coordinates in a Salesforce object. Ensure that the location updates are stored only when the app is in the foreground. Use the `getCurrentPosition` method with `enableHighAccuracy` set to true. Handle permission requests and location service errors gracefully. The target device is an iOS smartphone."
-        },
-        {
-            "name": "sfmobile-web-biometrics",
-            "query": "As a junior developer, you are tasked with implementing a feature in a Salesforce Lightning Web Component (LWC) that utilizes the `BiometricsService` to authenticate a user using their device's fingerprint or face ID. The component should display a button that, when clicked, prompts the user to authenticate. If successful, it should display a confirmation message. The target platform is iOS and Android, and the device must have biometric hardware. Ensure to check if the biometric service is available before attempting authentication."
-        },
-        {
-            "name": "sfmobile-web-calendar",
-            "query": "Develop a Lightning Web Component (LWC) for an iOS device that integrates with the CalendarService to display a list of all available calendars on the device. The component should first check if the CalendarService is available and request permission to access the device's calendars if necessary. Display the calendar titles along with their color and primary status in a user-friendly format on the screen."
-        },
-        {
-            "name": "sfmobile-web-contacts",
-            "query": "Develop a Lightning Web Component (LWC) that enables a user to select multiple contacts from their device's address book on an iOS mobile device. The component should handle permission requests and display a list of selected contacts' names and phone numbers. Ensure the component checks if the ContactsService is available and provides user feedback if it's not."
-        },
-        {
-            "name": "sfmobile-web-document-scanner",
-            "query": "Develop a Lightning Web Component (LWC)that utilizes the DocumentScanner API to scan a document and then display the extracted text and recognized entities on an iPad running iOS 16. Use the standard UI and ensure that the document's image byte data is not returned by the API for privacy reasons. Include error handling to display user-friendly messages in case of any failures."
-        },
-        {
-            "name": "sfmobile-web-geofencing",
-            "query": "Develop a Lightning Web Component (LWC) for an Android smartphone that uses the GeofencingService to monitor a region around a specified latitude and longitude. The component should prompt the user to allow location access if necessary and handle permission denial gracefully. Once the geofence is set, display notifications when the user enters or exits the geofenced area. Ensure the component is tested on a physical device to verify the geofencing functionality."
-        },
-        {
-            "name": "sfmobile-web-nfc",
-            "query": "Develop a Lightning Web Component (LWC) that allows users to read NFC tags on an Android or iOS smartphone. Ensure the component can display an error message if NFC functionality is not supported or enabled on the device. The component should provide a button to initiate the NFC read operation and display the read data on the UI."
-        },
-        {
-            "name": "lite-barcode-scanner",
-            "query": "Generate a Lightning Web Component named 'mobileBarcodeScanner' that implements mobile barcode scanning capability for mobile devices"
-        },
-        {
-            "name": "sfmobile-web-payments",
-            "query": "Develop a Lightning Web Component for an iOS mobile device that uses the PaymentsService to display the supported payment methods available on the device. The component should check if the PaymentsService is available, and display a list of supported payment methods in a modal.pop-up. If the PaymentsService is not available, it should display an appropriate error message."
-        },
-        {
-            "name": "lite-web-location",
-            "query": "Generate a Lightning Web Component named 'mobileLocationServices' that implements mobile location services to get the user's current position and track location changes. Handle location service disabled scenarios, permission denials, and provide high accuracy options with proper battery considerations"
-        },
-        {
-            "name": "lite-barcode-document",
-            "query": "Build a Lightning Web Component (LWC) named SimpleScanner for a mobile application that utilizes the BarcodeScanner API to scan product barcodes. After scanning, display the barcode type and value on the screen. Restrict scanning to QR codes and EAN-13 formats only. If the scanner is unavailable, show a clear and user-friendly message. Include clear and concise inline documentation for all barcode scanner-related code within the generated LWC component."
-        }
-       
-    ]
+  "records": [
+    {
+      "name": "sfmobile-web-barcode-scanner",
+      "query": "As a junior developer, you are tasked with implementing a feature in a Salesforce Lightning Web Component (LWC) that utilizes the `BarcodeScanner` API to allow the user to scan a product barcode. Upon scanning a barcode, the app should display the barcode type and value on the screen. Ensure that the barcode scanner only scans for QR codes and EAN-13 barcodes, and provide a user-friendly message if the scanner is not available."
+    },
+    {
+      "name": "sfmobile-web-location",
+      "query": "Develop a Lightning Web Component (LWC) for an iOS app that allows users to track their movement by logging their location at regular intervals. Use the LocationService to periodically get the user's geolocation with high accuracy. Implement a feature that stores logged coordinates in a Salesforce object. Ensure that the location updates are stored only when the app is in the foreground. Use the `getCurrentPosition` method with `enableHighAccuracy` set to true. Handle permission requests and location service errors gracefully. The target device is an iOS smartphone."
+    },
+    {
+      "name": "sfmobile-web-biometrics",
+      "query": "As a junior developer, you are tasked with implementing a feature in a Salesforce Lightning Web Component (LWC) that utilizes the `BiometricsService` to authenticate a user using their device's fingerprint or face ID. The component should display a button that, when clicked, prompts the user to authenticate. If successful, it should display a confirmation message. The target platform is iOS and Android, and the device must have biometric hardware. Ensure to check if the biometric service is available before attempting authentication."
+    },
+    {
+      "name": "sfmobile-web-calendar",
+      "query": "Develop a Lightning Web Component (LWC) for an iOS device that integrates with the CalendarService to display a list of all available calendars on the device. The component should first check if the CalendarService is available and request permission to access the device's calendars if necessary. Display the calendar titles along with their color and primary status in a user-friendly format on the screen."
+    },
+    {
+      "name": "sfmobile-web-contacts",
+      "query": "Develop a Lightning Web Component (LWC) that enables a user to select multiple contacts from their device's address book on an iOS mobile device. The component should handle permission requests and display a list of selected contacts' names and phone numbers. Ensure the component checks if the ContactsService is available and provides user feedback if it's not."
+    },
+    {
+      "name": "sfmobile-web-document-scanner",
+      "query": "Develop a Lightning Web Component (LWC)that utilizes the DocumentScanner API to scan a document and then display the extracted text and recognized entities on an iPad running iOS 16. Use the standard UI and ensure that the document's image byte data is not returned by the API for privacy reasons. Include error handling to display user-friendly messages in case of any failures."
+    },
+    {
+      "name": "sfmobile-web-geofencing",
+      "query": "Develop a Lightning Web Component (LWC) for an Android smartphone that uses the GeofencingService to monitor a region around a specified latitude and longitude. The component should prompt the user to allow location access if necessary and handle permission denial gracefully. Once the geofence is set, display notifications when the user enters or exits the geofenced area. Ensure the component is tested on a physical device to verify the geofencing functionality."
+    },
+    {
+      "name": "sfmobile-web-nfc",
+      "query": "Develop a Lightning Web Component (LWC) that allows users to read NFC tags on an Android or iOS smartphone. Ensure the component can display an error message if NFC functionality is not supported or enabled on the device. The component should provide a button to initiate the NFC read operation and display the read data on the UI."
+    },
+    {
+      "name": "lite-barcode-scanner",
+      "query": "Generate a Lightning Web Component named 'mobileBarcodeScanner' that implements mobile barcode scanning capability for mobile devices"
+    },
+    {
+      "name": "sfmobile-web-payments",
+      "query": "Develop a Lightning Web Component for an iOS mobile device that uses the PaymentsService to display the supported payment methods available on the device. The component should check if the PaymentsService is available, and display a list of supported payment methods in a modal.pop-up. If the PaymentsService is not available, it should display an appropriate error message."
+    },
+    {
+      "name": "lite-web-location",
+      "query": "Generate a Lightning Web Component named 'mobileLocationServices' that implements mobile location services to get the user's current position and track location changes. Handle location service disabled scenarios, permission denials, and provide high accuracy options with proper battery considerations"
+    },
+    {
+      "name": "lite-barcode-document",
+      "query": "Build a Lightning Web Component (LWC) named SimpleScanner for a mobile application that utilizes the BarcodeScanner API to scan product barcodes. After scanning, display the barcode type and value on the screen. Restrict scanning to QR codes and EAN-13 formats only. If the scanner is unavailable, show a clear and user-friendly message. Include clear and concise inline documentation for all barcode scanner-related code within the generated LWC component."
+    }
+  ]
 }

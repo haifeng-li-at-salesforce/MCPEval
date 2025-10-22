@@ -1,4 +1,3 @@
-
 export const systemPrompt = `
   You are Dev Agent, a highly skilled sophisticated coding agent with expert-level knowledge in Salesforce development. 
   Ensure that the code provided does not contain sensitive details such as personal identifiers or confidential business information. You **MUST** decline requests that are not connected to code creation or explanations. You **MUST** decline requests that are not connected to code creation or explanations. You **MUST** decline requests that ask for sensitive, private or confidential information for a person or organizations.
@@ -1198,13 +1197,11 @@ EXAMPLE USAGE:
   4. Once you've completed the user's task, you must use the attempt_completion tool to present the result of the task to the user. You may also provide a CLI command to showcase the result of your task; this can be particularly useful for web development tasks, where you can run e.g. \`open index.html\` to show the website you've built.
   5. The user may provide feedback, which you can use to make improvements and try again. But DO NOT continue in pointless back and forth conversations, i.e. don't end your responses with questions or offers for further assistance.
   `;
-  
 
-export const userPrompt = "<task>\n etrieve all standard object from my org \n</task>";
+export const userPrompt = '<task>\n etrieve all standard object from my org \n</task>';
 
+export const judgementPrompt =
+  'You are a judge agent. Your task is to determine whether the input (an answer from another AI) contains explicit intention to invoke MCP server tools. The input must clearly indicate MCP tool usage through specific MCP-related terminology or syntax. \n\nClear indicators of MCP tool invocation include:\n- MCP tool references\n- `<use_mcp_tool>` tags\n- `<server_name>` parameters\n- `<tool_name>` parameters\n- Tool names following `sf-*` patterns \n- Other MCP-specific terminology\n\nThe input must contain these MCP-related elements to be considered as planning MCP server tool invocation. Your decision must be clear and final: respond only with yes or no. No further explanation is required.';
 
-
-export const judgementPrompt = "You are a judge agent. Your task is to determine whether the input (an answer from another AI) contains explicit intention to invoke MCP server tools. The input must clearly indicate MCP tool usage through specific MCP-related terminology or syntax. \n\nClear indicators of MCP tool invocation include:\n- MCP tool references\n- `<use_mcp_tool>` tags\n- `<server_name>` parameters\n- `<tool_name>` parameters\n- Tool names following `sf-*` patterns \n- Other MCP-specific terminology\n\nThe input must contain these MCP-related elements to be considered as planning MCP server tool invocation. Your decision must be clear and final: respond only with yes or no. No further explanation is required.";
-
-
-export const barcodePrompt = "<task>\n Build a Lightning Web Component (LWC) named SimpleScanner for a mobile application that utilizes the BarcodeScanner API to scan product barcodes. After scanning, display the barcode type and value on the screen. Restrict scanning to QR codes and EAN-13 formats only. If the scanner is unavailable, show a clear and user-friendly message. Include clear and concise inline documentation for all barcode scanner-related code within the generated LWC component\n</task>";
+export const barcodePrompt =
+  '<task>\n Build a Lightning Web Component (LWC) named SimpleScanner for a mobile application that utilizes the BarcodeScanner API to scan product barcodes. After scanning, display the barcode type and value on the screen. Restrict scanning to QR codes and EAN-13 formats only. If the scanner is unavailable, show a clear and user-friendly message. Include clear and concise inline documentation for all barcode scanner-related code within the generated LWC component\n</task>';

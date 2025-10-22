@@ -2,12 +2,17 @@
 import { EventEmitter } from 'events';
 import { ModelMessage, RequestBody, EventResponse, DoneResponse } from './streaming-request';
 import { Response } from './streaming-response';
-import { ModelConfiguration, OPENAI_GPT5_CONFIG, QWEN_CONFIG, modelConfigs, EinsteinDevModel } from '../model/model-configs';
+import {
+  ModelConfiguration,
+  OPENAI_GPT5_CONFIG,
+  QWEN_CONFIG,
+  modelConfigs,
+  EinsteinDevModel,
+} from '../model/model-configs';
 import { OpenAI } from 'openai';
 import { Stream } from 'openai/streaming';
 import * as dotenv from 'dotenv';
 import { ModelClient } from './model-client';
-
 
 // Load environment variables
 dotenv.config();
@@ -29,12 +34,15 @@ function isEventResponse(chunk: unknown): chunk is EventResponse {
 }
 
 function isDoneResponse(chunk: unknown): chunk is DoneResponse {
-  return ( typeof chunk === 'object' && chunk !== null && 'event' in chunk && 'data' in chunk && (chunk as any).event === 'generation' && (chunk as any).data === 'DONE');
+  return (
+    typeof chunk === 'object' &&
+    chunk !== null &&
+    'event' in chunk &&
+    'data' in chunk &&
+    (chunk as any).event === 'generation' &&
+    (chunk as any).data === 'DONE'
+  );
 }
-
-
-
-
 
 export class OpenAIStreamingClient extends EventEmitter {
   private baseUrl: string;
@@ -42,8 +50,7 @@ export class OpenAIStreamingClient extends EventEmitter {
   private openai: OpenAI;
   private parameters: Record<string, any>;
 
-  constructor(config: ModelConfiguration
-  ) {
+  constructor(config: ModelConfiguration) {
     super();
     this.baseUrl = config.baseUrl || 'https://test.api.salesforce.com/einstein/gpt/code/v1.1';
     this.parameters = config.parameters || {};
@@ -52,14 +59,13 @@ export class OpenAIStreamingClient extends EventEmitter {
     this.openai = new OpenAI({
       apiKey: '',
       defaultHeaders: {
-        'Authorization': `API_KEY ${config.apiKey}`,
+        Authorization: `API_KEY ${config.apiKey}`,
         'X-Client-Feature-Id': config.featureId,
         'X-Sfdc-Core-Tenant-Id': config.tenantId,
-        ...(config.modelProvider ? { 'X-LLM-Provider': config.modelProvider } : {})
-      }
+        ...(config.modelProvider ? { 'X-LLM-Provider': config.modelProvider } : {}),
+      },
     });
   }
-
 
   /**
    * Create streaming request to Salesforce API
@@ -68,30 +74,25 @@ export class OpenAIStreamingClient extends EventEmitter {
     const url = `${this.baseUrl}/chat/generations/stream`;
     return this.openai.post<RequestBody, Stream<unknown>>(url, {
       stream: true,
-      body: request
+      body: request,
     });
   }
 
-  
   /**
    * High-level method to stream chat completion
    */
-  async chat(messages: ModelMessage[], options: {
-    maxTokens?: number; // If absent, defaults to 2048
-    temperature?: number;
-    onContent?: (content: string) => void;
-    onChunk?: (chunk: EventResponse) => void;
-    onError?: (error: Error) => void;
-    onEnd?: () => void;
-  } = {}): Promise<void> {
-    const {
-      maxTokens = 2048,
-      temperature,
-      onContent,
-      onChunk,
-      onError,
-      onEnd
-    } = options;
+  async chat(
+    messages: ModelMessage[],
+    options: {
+      maxTokens?: number; // If absent, defaults to 2048
+      temperature?: number;
+      onContent?: (content: string) => void;
+      onChunk?: (chunk: EventResponse) => void;
+      onError?: (error: Error) => void;
+      onEnd?: () => void;
+    } = {}
+  ): Promise<void> {
+    const { maxTokens = 2048, temperature, onContent, onChunk, onError, onEnd } = options;
 
     // Set up event listeners
     if (onContent) this.on('content', onContent);
@@ -106,12 +107,12 @@ export class OpenAIStreamingClient extends EventEmitter {
         temperature,
         generation_settings: {
           max_tokens: maxTokens,
-          parameters: this.parameters
-        }
+          parameters: this.parameters,
+        },
       };
 
       const stream = await this.post(request);
-      for await (const chunk of stream) { 
+      for await (const chunk of stream) {
         this.processGeneration(chunk);
       }
       this.emit('end');
@@ -136,12 +137,9 @@ export class OpenAIStreamingClient extends EventEmitter {
           }
         }
       }
-     
-      
-      
     } else if (isDoneResponse(chunk)) {
       this.emit('end');
-    }else {
+    } else {
       //console.warn('Received non-EventResponse chunk:', chunk);
     }
   }
@@ -158,29 +156,31 @@ export class EinsteinDevModelClient extends ModelClient {
     let fullResponse = '';
     let error: Error | null = null;
     try {
-      await client.chat([{role: 'system', content: systemPrompt}, {role: 'user', content: userPrompt}],{
-        maxTokens: 2048,
-        onContent: (content: string) => {
-          fullResponse += content;
-        },
-        onError: (error: Error) => {
-          error = error;
+      await client.chat(
+        [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        {
+          maxTokens: 2048,
+          onContent: (content: string) => {
+            fullResponse += content;
+          },
+          onError: (error: Error) => {
+            error = error;
+          },
         }
-      });
-    }catch (error) {
+      );
+    } catch (error) {
       error = error instanceof Error ? error : new Error(String(error));
     }
 
     if (error != null) {
       return { error: error, response: null };
-    } 
+    }
     return { error: null, response: fullResponse };
   }
 }
-
-
- 
-
 
 // Example usage and testing
 export async function testStreamingClient(config: ModelConfiguration) {
@@ -193,10 +193,7 @@ export async function testStreamingClient(config: ModelConfiguration) {
   let tokenCount = 0;
 
   try {
-    await client.chat([
-      { role: 'user', content: 'Write Fibonacci functions in Typescript' }
-    ], {
-
+    await client.chat([{ role: 'user', content: 'Write Fibonacci functions in Typescript' }], {
       maxTokens: 2048,
       onContent: (content: string) => {
         process.stdout.write(content);
@@ -205,7 +202,6 @@ export async function testStreamingClient(config: ModelConfiguration) {
       onChunk: (chunk: EventResponse) => {
         // Update usage statistics
         tokenCount++;
-     
       },
       onError: (error: Error) => {
         console.error('\n❌ Error:', error.message);
@@ -214,7 +210,7 @@ export async function testStreamingClient(config: ModelConfiguration) {
         console.log('\n\n✅ Streaming completed!');
         console.log(`📝 Full response: ${fullResponse}`);
         console.log(`🔢 Content chunks received: ${tokenCount}`);
-      }
+      },
     });
   } catch (error) {
     console.error('❌ Test failed:', error);
@@ -223,4 +219,3 @@ export async function testStreamingClient(config: ModelConfiguration) {
 
 // Export for use in other files
 export default OpenAIStreamingClient;
-

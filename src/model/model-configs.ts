@@ -1,7 +1,6 @@
 // Example: How to implement model switching for Salesforce API (SF_API_URL)
 // This is a hypothetical implementation showing the pattern
 
-
 import * as dotenv from 'dotenv';
 
 // Load environment variables
@@ -23,7 +22,6 @@ export enum LLMExpressModel {
   GPT_4O_MINI = 'gpt-4o-mini',
 }
 
-
 export interface ModelConfiguration {
   model: string;
   apiKey: string;
@@ -35,7 +33,6 @@ export interface ModelConfiguration {
   parameters?: Record<string, any>;
 }
 
-
 export const OPENAI_GPT5_CONFIG: ModelConfiguration = {
   model: 'llmgateway__OpenAIGPT5',
   apiKey: process.env.OPENAI_API_KEY || '',
@@ -43,7 +40,7 @@ export const OPENAI_GPT5_CONFIG: ModelConfiguration = {
   featureId: process.env.OPENAI_FEATURE_ID || 'EinsteinForDevelopers',
   baseUrl: process.env.OPENAI_BASE_URL || 'https://test.api.salesforce.com/einstein/gpt/code/v1.1',
   maxTokens: 2048,
-  parameters: {}
+  parameters: {},
 };
 
 export const QWEN_CONFIG: ModelConfiguration = {
@@ -54,16 +51,13 @@ export const QWEN_CONFIG: ModelConfiguration = {
   baseUrl: process.env.XGEN_BASE_URL || 'https://test.api.salesforce.com/einstein/gpt/code/v1.1',
   modelProvider: 'InternalTextGeneration',
   maxTokens: 2048,
-  parameters: {"command_source": "Chat"}
+  parameters: { command_source: 'Chat' },
 };
 
 export const modelConfigs: Record<EinsteinDevModel, ModelConfiguration> = {
   [EinsteinDevModel.GPT5]: OPENAI_GPT5_CONFIG,
   [EinsteinDevModel.XGEN]: QWEN_CONFIG,
-}
-
-
-
+};
 
 // Uncomment to run the demo
 // runSalesforceExample();

@@ -1,34 +1,31 @@
-
 export interface ModelMessage {
-    role: 'user' | 'assistant' | 'system';
-    content: string;
-  }
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
 
-  
 export interface RequestBody {
-    model: string;
-    messages: ModelMessage[];
-    max_tokens?: number;
-    generation_settings?: {
-      max_tokens: number;
-      parameters: Record<string, any>;
-    };
-    temperature?: number;
-    stream?: boolean;
-  }
+  model: string;
+  messages: ModelMessage[];
+  max_tokens?: number;
+  generation_settings?: {
+    max_tokens: number;
+    parameters: Record<string, any>;
+  };
+  temperature?: number;
+  stream?: boolean;
+}
 
-  export interface ToolInvocation {
-    id: string;
-    function: {
-      name: string;
-      arguments: string;
-    };
-  }
-  
+export interface ToolInvocation {
+  id: string;
+  function: {
+    name: string;
+    arguments: string;
+  };
+}
+
 export interface DoneResponse {
-    event: 'generation';
-    data:['DONE']
-
+  event: 'generation';
+  data: ['DONE'];
 }
 export interface EventResponse {
   event: 'generation';
