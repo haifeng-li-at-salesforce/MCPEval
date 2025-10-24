@@ -40,7 +40,7 @@ export class LLMExpressModelClient extends ModelClient {
       return { error: new Error(`Failed to chat: ${response.statusText}`), response: null };
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
     return { error: null, response: data.choices[0].message.content };
   }
 }
