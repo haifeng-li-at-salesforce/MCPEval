@@ -9,13 +9,15 @@ describe('EinsteinDevModel Tests', () => {
     it(`should return Paris for capital of France using ${model}`, async () => {
       const client = new EinsteinDevModelClient(model);
       const result = await client.chat(
-        'You are a helpful assistant.',
-        'What is the capital of France?'
+        [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: 'What is the capital of France?' },
+        ]
       );
 
       expect(result.error).toBeNull();
       expect(result.response).not.toBeNull();
-      expect(result.response?.toLowerCase()).toContain('paris');
+      expect(result.response?.[0].content.toLowerCase()).toContain('paris');
     }, 60000); // 60 second timeout for API calls
   });
 });
@@ -26,13 +28,15 @@ describe('LLMExpressModel Tests', () => {
     it(`should return Paris for capital of France using ${model}`, async () => {
       const client = new LLMExpressModelClient(model);
       const result = await client.chat(
-        'You are a helpful assistant.',
-        'What is the capital of France?'
+        [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: 'What is the capital of France?' },
+        ]
       );
 
       expect(result.error).toBeNull();
       expect(result.response).not.toBeNull();
-      expect(result.response?.toLowerCase()).toContain('paris');
+      expect(result.response?.[0].content.toLowerCase()).toContain('paris');
     }, 60000); // 60 second timeout for API calls
   });
 });

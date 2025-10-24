@@ -2,8 +2,10 @@ import { ModelClient } from './model-client';
 import { LLMExpressModel } from '../model/model-configs';
 import * as dotenv from 'dotenv';
 import { Response } from './streaming-response';
+import { ModelMessage } from './streaming-request';
 
-dotenv.config();
+// Load environment variables from .env file, overriding system environment variables
+dotenv.config({ override: true });
 
 const LLM_EXPRESS_BASE_URL = process.env.LLM_EXPRESS_GATEWAY_BASE_URL;
 const LLM_EXPRESS_API_KEY = process.env.LLM_EXPRESS_GATEWAY_API_KEY;
@@ -15,7 +17,7 @@ export class LLMExpressModelClient extends ModelClient {
     this.model = model;
   }
 
-  async chat(systemPrompt: string, userPrompt: string): Promise<Response> {
+  async chat(messages: ModelMessage[]): Promise<Response> {
     const url = `${LLM_EXPRESS_BASE_URL}/chat/completions`;
     const headers = {
       Authorization: `Bearer ${LLM_EXPRESS_API_KEY}`,
@@ -23,10 +25,7 @@ export class LLMExpressModelClient extends ModelClient {
     };
     const body = {
       model: this.model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
+      messages: messages,
       stream: false,
     };
 
@@ -52,8 +51,12 @@ export async function testLLMExpressModelClient(model: LLMExpressModel) {
   console.log('🤖 Model: ', model);
 
   const response = await client.chat(
-    'You are a helpful assistant.',
-    'What is the capital of France?'
+   
+    [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: 'What is the capital of France?' },
+    ]
+    
   );
   console.log(response);
 }

@@ -1,6 +1,6 @@
 // OpenAIStreamingWebClient for Salesforce API with SSE support
 import { EventEmitter } from 'events';
-import { ModelMessage, RequestBody, EventResponse, DoneResponse } from './streaming-request';
+import { ModelMessage, RequestBody, EventResponse, DoneResponse, GenerationSchema, Generation } from './streaming-request';
 import { Response } from './streaming-response';
 import {
   ModelConfiguration,
@@ -14,8 +14,8 @@ import { Stream } from 'openai/streaming';
 import * as dotenv from 'dotenv';
 import { ModelClient } from './model-client';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from .env file, overriding system environment variables
+dotenv.config({ override: true });
 
 // Export alias for compatibility
 export type StreamingMessage = ModelMessage;
@@ -86,15 +86,17 @@ export class OpenAIStreamingClient extends EventEmitter {
     options: {
       maxTokens?: number; // If absent, defaults to 2048
       temperature?: number;
+      onGeneration?: (generation: Generation) => void;
       onContent?: (content: string) => void;
       onChunk?: (chunk: EventResponse) => void;
       onError?: (error: Error) => void;
       onEnd?: () => void;
     } = {}
   ): Promise<void> {
-    const { maxTokens = 2048, temperature, onContent, onChunk, onError, onEnd } = options;
+    const { maxTokens = 2048, temperature, onGeneration, onContent, onChunk, onError, onEnd } = options;
 
     // Set up event listeners
+    if (onGeneration) this.on('generation', onGeneration);
     if (onContent) this.on('content', onContent);
     if (onChunk) this.on('chunk', onChunk);
     if (onError) this.on('error', onError);
@@ -115,8 +117,10 @@ export class OpenAIStreamingClient extends EventEmitter {
       for await (const chunk of stream) {
         this.processGeneration(chunk);
       }
+
       this.emit('end');
     } catch (error) {
+      console.error('Error:', error);
       this.emit('error', error);
     }
   }
@@ -132,7 +136,10 @@ export class OpenAIStreamingClient extends EventEmitter {
       // Process generations
       if (chunk.data.generation_details.generations) {
         for (const generation of chunk.data.generation_details.generations) {
+          const validGeneration = GenerationSchema.parse(generation);
+          this.emit('generation', validGeneration);
           if (generation.content) {
+            console.log('Generation content:', generation.content);
             this.emit('content', generation.content);
           }
         }
@@ -140,29 +147,40 @@ export class OpenAIStreamingClient extends EventEmitter {
     } else if (isDoneResponse(chunk)) {
       this.emit('end');
     } else {
-      //console.warn('Received non-EventResponse chunk:', chunk);
+      console.warn('Received non-EventResponse chunk:', chunk);
     }
   }
 }
 
 export class EinsteinDevModelClient extends ModelClient {
   private config: ModelConfiguration;
+  private maxTokens: number = 128000;
   constructor(model: EinsteinDevModel) {
     super();
     this.config = modelConfigs[model];
   }
-  async chat(systemPrompt: string, userPrompt: string): Promise<Response> {
+
+  // async chat(systemPrompt: string, userPrompt: string): Promise<Response> {
+  //   return this.chat([{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }]);
+  // }
+
+  async chat(messages: ModelMessage[]): Promise<Response> {
     const client = new OpenAIStreamingClient(this.config);
     let fullResponse = '';
     let error: Error | null = null;
+    let generations: Record<string, Generation> = {};
     try {
       await client.chat(
-        [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
+        messages,
         {
-          maxTokens: 2048,
+          maxTokens: this.maxTokens,
+          onGeneration: (generation: Generation) => {
+            if (generation.id in generations) {
+              generations[generation.id].content += generation.content;
+            } else {
+              generations[generation.id] = generation;
+            }
+          },
           onContent: (content: string) => {
             fullResponse += content;
           },
@@ -178,7 +196,12 @@ export class EinsteinDevModelClient extends ModelClient {
     if (error != null) {
       return { error: error, response: null };
     }
-    return { error: null, response: fullResponse };
+
+    const modelResponse: ModelMessage[] = Object.values(generations).map(generation => ({
+      role: generation.role,
+      content: generation.content,
+    }));
+    return { error: null, response: modelResponse };
   }
 }
 

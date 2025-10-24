@@ -6,15 +6,20 @@ import { LLMExpressModelClient } from '../clients/chatcompletion-client';
 export async function testAiClient() {
   const client = new EinsteinDevModelClient(EinsteinDevModel.XGEN);
   const response = await client.chat(
-    'You are a helpful assistant.',
-    'What is the capital of France?'
+    [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: 'What is the capital of France?' },
+    ]
   );
   console.log(response);
 
   const expressClient = new LLMExpressModelClient(LLMExpressModel.GEMINI_2_5_FLASH);
   const expressResponse = await expressClient.chat(
-    'You are a helpful assistant.',
-    'What is the capital of France?'
+    [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: 'What is the capital of France?' },
+    ]
+   
   );
   console.log(expressResponse);
 }

@@ -3,8 +3,8 @@
 
 import * as dotenv from 'dotenv';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from .env file, overriding system environment variables
+dotenv.config({ override: true });
 
 export enum EinsteinDevModel {
   GPT5 = 'GPT5',

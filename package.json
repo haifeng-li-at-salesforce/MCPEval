@@ -28,7 +28,8 @@
     "@anthropic-ai/sdk": "^0.24.3",
     "ai": "^5.0.78",
     "dotenv": "^17.2.3",
-    "openai": "^4.28.0"
+    "openai": "^4.28.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
