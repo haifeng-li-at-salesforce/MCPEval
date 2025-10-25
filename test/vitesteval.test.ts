@@ -7,9 +7,9 @@ import { einsteinLlmGateway, expressLlmGateway } from './utils/llm-gateways';
 
 // Define models to test
 const models = [
-  { name: 'gpt-4o-llmgateway', model: expressLlmGateway('gpt-4o') },
-  { name: 'gemini-2.5-flash', model: google('gemini-2.5-flash') },
-  { name: 'xgen_einstein', model: einsteinLlmGateway('xgen_stream', { 'X-LLM-Provider': 'InternalTextGeneration' }) },
+//   { name: 'gpt-4o-llmgateway', model: expressLlmGateway('gpt-4o') },
+//   { name: 'gemini-2.5-flash', model: google('gemini-2.5-flash') },
+//   { name: 'xgen_einstein', model: einsteinLlmGateway('xgen_stream', { 'X-LLM-Provider': 'InternalTextGeneration' }) },
   { name: 'OpenAIGPT5_einstein', model: einsteinLlmGateway('llmgateway__OpenAIGPT5') },
 ];
 
