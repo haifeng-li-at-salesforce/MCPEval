@@ -41,6 +41,28 @@ const JudgementSchema = z.object({
   toolCalled: z.boolean(),
 });
 
+
+export const ToolCallEvalBaseSchema = z.object({
+  reasoning: z.string().describe('A brief explanation for your chosen action.'),
+  originalContent: z.string().describe('The raw response content from the target coding model.'),
+  followUpInput: z
+    .string()
+    .optional()
+    .describe(
+      `Suggested follow-up input to be sent to the model as a user message, guiding it toward invoking the tool when nextAction = 'continue'.
+       If the operation involves file handling, suggest to the model to provide the full file content directly instead of invoking any file-writing tool.
+       The follow-up should move the model toward the next logical step in completing the task.
+       If the last assistant message represents a tool invocation —- where the XML root element is the tool name and its child elements are the tool parameters, then suggest a tool result message in the following format:
+       "[tool_name] Result: <description of the result that allows progress to the next logical step>"
+       For example, if the last assistant message is:
+       <write_to_file><path>force-app/main/default/lwc/mobileBarcodeScanner/mobileBarcodeScanner.js</path><content>import { LightningElement } from 'lwc';
+       </content></write_to_file>
+      Then the suggested follow-up message should be:
+       [write_to_file for="force-app/main/default/lwc/mobileBarcodeScanner/mobileBarcodeScanner.js"] Result: The file is written successfully.
+       `
+    ),
+});
+
 export const ToolCallEvalSchema = z.object({
   nextAction: z.enum(['continue', 'fail', 'success']).describe(`
       The evaluation result:
@@ -68,7 +90,7 @@ export const ToolCallEvalSchema = z.object({
     ),
 });
 
-export class WorkflowAgent {
+export class ToolDiscoveryAgent {
   private model: ModelClient;
   private judgementModel: LanguageModel; // LanguageModel type causes deep instantiation
   private systemPrompt: string;
@@ -83,7 +105,7 @@ export class WorkflowAgent {
     this.maxSteps = options.maxSteps;
   }
 
-  async evaluate(
+  async discover(
     userPrompt: string,
     toolName: string,
     enableA4VSetting: boolean = false
@@ -128,9 +150,9 @@ export class WorkflowAgent {
         judgementResponse!.nextAction = 'continue';
       }
 
-      console.log("Next action:", judgementResponse!.nextAction);
-      console.log("Reasoning:", judgementResponse!.reasoning);
-      console.log("Follow-up input:", judgementResponse!.followUpInput);
+      console.log("🎯 Next action:", judgementResponse!.nextAction);
+      console.log("💭 Reasoning:", judgementResponse!.reasoning);
+      console.log("📝 Follow-up input:", judgementResponse!.followUpInput);
     } while (judgementResponse?.nextAction === 'continue' && step <= this.maxSteps);
 
     if (!judgementResponse) {
@@ -153,7 +175,7 @@ export class WorkflowAgent {
 
    b. fail — The model decides not to use the ${toolName} tool, opting instead to implement its own logic or use a different tool.
 
-   c. success — The model outputs a valid XML structure with <use_mcp_tool> as the root element and <tool_name> set to create_mobile_lwc_barcode_scanner.
+   c. success — The model outputs a valid XML structure with <use_mcp_tool> as the root element and <tool_name> set to ${toolName}.
 
 2. Provide a brief explanation for your chosen action.
 
