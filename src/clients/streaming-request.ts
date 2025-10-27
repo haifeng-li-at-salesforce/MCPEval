@@ -35,25 +35,28 @@ export const DoneResponseSchema = z.object({
 
 export const GenerationSchema = ModelMessageSchema.extend({
   id: z.string(),
+  contents: z.null(),
   timestamp: z.number().nullable(),
+  log_probability_result: z.null(),
   parameters: z.object({
-    finish_reason: z.string().nullable(),
-    index: z.number(),
-    logprobs: z.number().nullable(),
-  }),
-  generation_safety_score: z.null(),
-  generation_content_quality: z.null(),
+    finish_reason: z.string().nullable().optional(),
+    index: z.number().optional(),
+    logprobs: z.number().nullable().optional(),
+    token_log_prob: z.number().optional(),
+    token_id: z.number().optional(),
+  }).nullable(),
+  generation_safety_score: z.number().nullable(),
+  generation_content_quality: z.number().nullable(),
   tool_invocations: z.array(ToolInvocationSchema).nullable(),
-});
+  web_search_result: z.null(),
+}).passthrough();
 
 export const EventResponseSchema = z.object({
   event: z.literal('generation'),
   data: z.object({
     id: z.string(),
     generation_details: z.object({
-      generations: z.array(
-        GenerationSchema
-      ),
+      generations: z.array(GenerationSchema),
       parameters: z.object({
         provider: z.string(),
         created: z.number(),

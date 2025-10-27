@@ -4,7 +4,6 @@ import { EinsteinDevModelClient } from '../src/clients/streaming-client';
 
 // Mock the streaming-client module
 
-
 describe('toolDiscoveryWorkflow Tests', () => {
   let consoleLogSpy: any;
 
@@ -21,18 +20,13 @@ describe('toolDiscoveryWorkflow Tests', () => {
 
   it('should successfully execute workflow and return false', async () => {
     // Mock the chat method response
-   
+
     // Execute the workflow
     const result = await toolDiscoveryWorkflow();
 
     // Verify the result
     expect(result).toBe(false);
 
-
-
     // Verify chat method was called
-    
   }, 600000);
-
 });
-

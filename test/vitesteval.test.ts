@@ -9,7 +9,10 @@ import { einsteinLlmGateway, expressLlmGateway } from './utils/llm-gateways';
 const models = [
   { name: 'gpt-4o-llmgateway', model: expressLlmGateway('gpt-4o') },
   { name: 'gemini-2.5-flash', model: google('gemini-2.5-flash') },
-  { name: 'xgen_einstein', model: einsteinLlmGateway('xgen_stream', { 'X-LLM-Provider': 'InternalTextGeneration' }) },
+  {
+    name: 'xgen_einstein',
+    model: einsteinLlmGateway('xgen_stream', { 'X-LLM-Provider': 'InternalTextGeneration' }),
+  },
   { name: 'OpenAIGPT5_einstein', model: einsteinLlmGateway('llmgateway__OpenAIGPT5') },
 ];
 
@@ -22,7 +25,7 @@ const testData = async () => [
   {
     input: 'What is the 7th Fibonacci number? Return ONLY the numeric answer, nothing else.',
     expected: '13',
-  }
+  },
 ];
 
 // Scorer function

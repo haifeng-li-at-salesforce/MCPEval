@@ -8,7 +8,7 @@ import { toolDiscoveryWorkflow } from './eval/tool-discovery-workflow';
 
 async function main() {
   //testStreamingClient(QWEN_CONFIG);
-  //testAiClient();
+  //await testAiClient();
   await toolDiscoveryWorkflow();
   //testLLMExpressModelClient(LLMExpressModel.GEMINI_2_5_FLASH);
 }

@@ -8,12 +8,10 @@ describe('EinsteinDevModel Tests', () => {
   Object.values(EinsteinDevModel).forEach((model) => {
     it(`should return Paris for capital of France using ${model}`, async () => {
       const client = new EinsteinDevModelClient(model);
-      const result = await client.chat(
-        [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: 'What is the capital of France?' },
-        ]
-      );
+      const result = await client.chat([
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: 'What is the capital of France?' },
+      ]);
 
       expect(result.error).toBeNull();
       expect(result.response).not.toBeNull();
@@ -27,12 +25,10 @@ describe('LLMExpressModel Tests', () => {
   Object.values(LLMExpressModel).forEach((model) => {
     it(`should return Paris for capital of France using ${model}`, async () => {
       const client = new LLMExpressModelClient(model);
-      const result = await client.chat(
-        [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: 'What is the capital of France?' },
-        ]
-      );
+      const result = await client.chat([
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: 'What is the capital of France?' },
+      ]);
 
       expect(result.error).toBeNull();
       expect(result.response).not.toBeNull();

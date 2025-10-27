@@ -1,6 +1,13 @@
 // OpenAIStreamingWebClient for Salesforce API with SSE support
 import { EventEmitter } from 'events';
-import { ModelMessage, RequestBody, EventResponse, DoneResponse, GenerationSchema, Generation } from './streaming-request';
+import {
+  ModelMessage,
+  RequestBody,
+  EventResponse,
+  DoneResponse,
+  GenerationSchema,
+  Generation,
+} from './streaming-request';
 import { Response } from './streaming-response';
 import {
   ModelConfiguration,
@@ -93,7 +100,15 @@ export class OpenAIStreamingClient extends EventEmitter {
       onEnd?: () => void;
     } = {}
   ): Promise<void> {
-    const { maxTokens = 2048, temperature, onGeneration, onContent, onChunk, onError, onEnd } = options;
+    const {
+      maxTokens = 2048,
+      temperature,
+      onGeneration,
+      onContent,
+      onChunk,
+      onError,
+      onEnd,
+    } = options;
 
     // Set up event listeners
     if (onGeneration) this.on('generation', onGeneration);
@@ -136,10 +151,11 @@ export class OpenAIStreamingClient extends EventEmitter {
       // Process generations
       if (chunk.data.generation_details.generations) {
         for (const generation of chunk.data.generation_details.generations) {
+          //console.log('Generation:', generation);
           const validGeneration = GenerationSchema.parse(generation);
           this.emit('generation', validGeneration);
           if (generation.content) {
-            console.log('Generation content:', generation.content);
+            //console.log('Generation content:', generation.content);
             this.emit('content', generation.content);
           }
         }
@@ -147,14 +163,13 @@ export class OpenAIStreamingClient extends EventEmitter {
     } else if (isDoneResponse(chunk)) {
       this.emit('end');
     } else {
-      console.warn('Received non-EventResponse chunk:', chunk);
+      //console.warn('Received non-EventResponse chunk:', chunk);
     }
   }
 }
 
 export class EinsteinDevModelClient extends ModelClient {
   private config: ModelConfiguration;
-  private maxTokens: number = 128000;
   constructor(model: EinsteinDevModel) {
     super();
     this.config = modelConfigs[model];
@@ -170,38 +185,35 @@ export class EinsteinDevModelClient extends ModelClient {
     let error: Error | null = null;
     let generations: Record<string, Generation> = {};
     try {
-      await client.chat(
-        messages,
-        {
-          maxTokens: this.maxTokens,
-          onGeneration: (generation: Generation) => {
-            if (generation.id in generations) {
-              generations[generation.id].content += generation.content;
-            } else {
-              generations[generation.id] = generation;
-            }
-          },
-          onContent: (content: string) => {
-            fullResponse += content;
-          },
-          onError: (error: Error) => {
-            error = error;
-          },
-        }
-      );
-    } catch (error) {
-      error = error instanceof Error ? error : new Error(String(error));
+      await client.chat(messages, {
+        maxTokens: this.config.maxTokens,
+        onGeneration: (generation: Generation) => {
+          if (generation.id in generations) {
+            generations[generation.id].content += generation.content;
+          } else {
+            generations[generation.id] = generation;
+          }
+        },
+        onContent: (content: string) => {
+          fullResponse += content;
+        },
+        onError: (err: Error) => {
+          error = err;
+        },
+      });
+    } catch (err) {
+      error = err instanceof Error ? err : new Error(String(err));
     }
 
     if (error != null) {
-      return { error: error, response: null };
+      return { error: error, messages: null };
     }
 
-    const modelResponse: ModelMessage[] = Object.values(generations).map(generation => ({
+    const modelResponse: ModelMessage[] = Object.values(generations).map((generation) => ({
       role: generation.role,
       content: generation.content,
     }));
-    return { error: null, response: modelResponse };
+    return { error: null, messages: modelResponse };
   }
 }
 

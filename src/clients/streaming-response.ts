@@ -1,6 +1,6 @@
-import { ModelMessage } from "./streaming-request";
+import { ModelMessage } from './streaming-request';
 
 export interface Response {
   error: Error | null;
-  response: ModelMessage[]| null;
+  messages: ModelMessage[] | null;
 }

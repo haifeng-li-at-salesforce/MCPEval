@@ -853,7 +853,7 @@ What are the results for 707XXXXXXXXXXXX
         "$schema": "http://json-schema.org/draft-07/schema#"
       }
   
-  - sf-lwc-barcode-scanner: Implement LWC Barcode Scanner feature by providing a comprehensive TypeScript-based API. Supports 11+ barcode formats (QR, Code 128, UPC-A/E, EAN-13/8, PDF417, etc.), bulk/multi-scan modes, custom UI overlays, camera controls (front/back, zoom, flashlight), and configurable scanner sizes. Perfect for inventory management, asset tracking, product scanning, check-in systems, and any mobile app requiring barcode/QR code capture in Lightning Web Components.
+  - create_mobile_lwc_barcode_scanner: Implement LWC Barcode Scanner feature by providing a comprehensive TypeScript-based API. Supports 11+ barcode formats (QR, Code 128, UPC-A/E, EAN-13/8, PDF417, etc.), bulk/multi-scan modes, custom UI overlays, camera controls (front/back, zoom, flashlight), and configurable scanner sizes. Perfect for inventory management, asset tracking, product scanning, check-in systems, and any mobile app requiring barcode/QR code capture in Lightning Web Components.
 AGENT INSTRUCTIONS:
 To implement the Lightning Web Component (LWC) feature using the BarcodeScanner API
 

@@ -36,11 +36,12 @@ export class LLMExpressModelClient extends ModelClient {
     });
 
     if (!response.ok) {
-      return { error: new Error(`Failed to chat: ${response.statusText}`), response: null };
+      return { error: new Error(`Failed to chat: ${response.statusText}`), messages: null };
     }
 
-    const data = await response.json() as any;
-    return { error: null, response: data.choices[0].message.content };
+    const data = (await response.json()) as any;
+    //TODO: fix the messages format
+    return { error: null, messages: data.choices[0].message.content };
   }
 }
 
@@ -50,13 +51,9 @@ export async function testLLMExpressModelClient(model: LLMExpressModel) {
   console.log('🚀 Testing LLMExpressModelClient...\n');
   console.log('🤖 Model: ', model);
 
-  const response = await client.chat(
-   
-    [
-      { role: 'system', content: 'You are a helpful assistant.' },
-      { role: 'user', content: 'What is the capital of France?' },
-    ]
-    
-  );
+  const response = await client.chat([
+    { role: 'system', content: 'You are a helpful assistant.' },
+    { role: 'user', content: 'What is the capital of France?' },
+  ]);
   console.log(response);
 }
