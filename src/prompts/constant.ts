@@ -2402,7 +2402,7 @@ Carefully review the user's task:
 - If the task involves a standard Salesforce LWC request (e.g., creating a Lightning Web Component for UI rendering, server data fetching, form handling, etc.) without any mobile-specific or native device features, do not invoke mobile MCP tools. Instead, proceed with standard LWC development practices.
 - Never assume or create tools that are not explicitly available.
 
-`
+`;
 
 export const userPrompt = '<task>\n etrieve all standard object from my org \n</task>';
 

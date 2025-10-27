@@ -38,13 +38,15 @@ export const GenerationSchema = ModelMessageSchema.extend({
   contents: z.null(),
   timestamp: z.number().nullable(),
   log_probability_result: z.null(),
-  parameters: z.object({
-    finish_reason: z.string().nullable().optional(),
-    index: z.number().optional(),
-    logprobs: z.number().nullable().optional(),
-    token_log_prob: z.number().optional(),
-    token_id: z.number().optional(),
-  }).nullable(),
+  parameters: z
+    .object({
+      finish_reason: z.string().nullable().optional(),
+      index: z.number().optional(),
+      logprobs: z.number().nullable().optional(),
+      token_log_prob: z.number().optional(),
+      token_id: z.number().optional(),
+    })
+    .nullable(),
   generation_safety_score: z.number().nullable(),
   generation_content_quality: z.number().nullable(),
   tool_invocations: z.array(ToolInvocationSchema).nullable(),

@@ -28,47 +28,20 @@ export const TOOL_SCHEMA = TOOL_SCHEMA_FLEXIBLE;
 // const ListToolSchema = createToolSchema(z.array(z.string()));
 
 export type WorkflowAgentOptions = {
-  model: ModelClient;
-  judgementModel: any; // LanguageModel type causes deep instantiation
+  codingModel: ModelClient;
+  judgeModel: any; // LanguageModel type causes deep instantiation
   systemPrompt: string;
-  tools: Tool[];
   maxSteps: number;
 };
 
 export type Tool = z.infer<typeof TOOL_SCHEMA>;
 
-const JudgementSchema = z.object({
-  toolCalled: z.boolean(),
-});
-
-
-export const ToolCallEvalBaseSchema = z.object({
-  reasoning: z.string().describe('A brief explanation for your chosen action.'),
-  originalContent: z.string().describe('The raw response content from the target coding model.'),
-  followUpInput: z
-    .string()
-    .optional()
-    .describe(
-      `Suggested follow-up input to be sent to the model as a user message, guiding it toward invoking the tool when nextAction = 'continue'.
-       If the operation involves file handling, suggest to the model to provide the full file content directly instead of invoking any file-writing tool.
-       The follow-up should move the model toward the next logical step in completing the task.
-       If the last assistant message represents a tool invocation —- where the XML root element is the tool name and its child elements are the tool parameters, then suggest a tool result message in the following format:
-       "[tool_name] Result: <description of the result that allows progress to the next logical step>"
-       For example, if the last assistant message is:
-       <write_to_file><path>force-app/main/default/lwc/mobileBarcodeScanner/mobileBarcodeScanner.js</path><content>import { LightningElement } from 'lwc';
-       </content></write_to_file>
-      Then the suggested follow-up message should be:
-       [write_to_file for="force-app/main/default/lwc/mobileBarcodeScanner/mobileBarcodeScanner.js"] Result: The file is written successfully.
-       `
-    ),
-});
-
 export const ToolCallEvalSchema = z.object({
   nextAction: z.enum(['continue', 'fail', 'success']).describe(`
       The evaluation result:
-      - 'continue' → model shows willingness to invoke the tool but needs clarification or setup
-      - 'fail' → model decides not to use the barcode_scanner tool
-      - 'success' → model provides XML with <use_mcp_tool> root and <tool_name>create_mobile_lwc_barcode_scanner</tool_name>
+      - 'continue' → The model shows willingness to invoke the tool but needs clarification or setup
+      - 'fail' → The model decides not to use the tool
+      - 'success' → The model returns an XML structure with <use_mcp_tool> as the root element and <tool_name>, <server_name>, and <arguments> as its child elements.
     `),
   reasoning: z.string().describe('A brief explanation for your chosen action.'),
   originalContent: z.string().describe('The raw response content from the target coding model.'),
@@ -91,17 +64,17 @@ export const ToolCallEvalSchema = z.object({
 });
 
 export class ToolDiscoveryAgent {
-  private model: ModelClient;
-  private judgementModel: LanguageModel; // LanguageModel type causes deep instantiation
+  private codingModel: ModelClient;
+  private judgeModel: LanguageModel; // LanguageModel type causes deep instantiation
   private systemPrompt: string;
-  private tools: Tool[];
+
   private maxSteps: number;
 
   constructor(options: WorkflowAgentOptions) {
-    this.model = options.model;
-    this.judgementModel = options.judgementModel;
+    this.codingModel = options.codingModel;
+    this.judgeModel = options.judgeModel;
     this.systemPrompt = options.systemPrompt;
-    this.tools = options.tools;
+
     this.maxSteps = options.maxSteps;
   }
 
@@ -118,7 +91,7 @@ export class ToolDiscoveryAgent {
     let judgementResponse: z.infer<typeof ToolCallEvalSchema> | null = null;
     let step: number = 0;
     do {
-      const data = await this.model.chat(inputMessages);
+      const data = await this.codingModel.chat(inputMessages);
       if (data.error) {
         throw new Error('Error: ' + data.error.message);
       }
@@ -132,7 +105,7 @@ export class ToolDiscoveryAgent {
       console.log(messages[0].content);
 
       const { object } = await (generateObject as any)({
-        model: this.judgementModel,
+        model: this.judgeModel,
         schema: ToolCallEvalSchema,
         prompt: this.getJudgePrompt(toolName, messages[0].content),
       });
@@ -150,9 +123,9 @@ export class ToolDiscoveryAgent {
         judgementResponse!.nextAction = 'continue';
       }
 
-      console.log("🎯 Next action:", judgementResponse!.nextAction);
-      console.log("💭 Reasoning:", judgementResponse!.reasoning);
-      console.log("📝 Follow-up input:", judgementResponse!.followUpInput);
+      console.log('🎯 Next action:', judgementResponse!.nextAction);
+      console.log('💭 Reasoning:', judgementResponse!.reasoning);
+      console.log('📝 Follow-up input:', judgementResponse!.followUpInput);
     } while (judgementResponse?.nextAction === 'continue' && step <= this.maxSteps);
 
     if (!judgementResponse) {
