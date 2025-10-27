@@ -6,7 +6,6 @@ import { google } from '@ai-sdk/google';
 import { einsteinLlmGateway, expressLlmGateway } from './utils/llm-gateways';
 import { getMCPTools } from '../src/mcp/mcp-tool-loader';
 
-
 // Define models to test
 const models = [
   { name: 'gpt-4o-llmgateway', model: expressLlmGateway('gpt-4o') },
@@ -20,75 +19,60 @@ const models = [
 
 // Test data
 const testData = async () => [
-  { 
-    name: 'gemini-2.5-flash', 
-    model: google('gemini-2.5-flash'), 
-    utilizeModelMcpTools: false 
+  {
+    name: 'gemini-2.5-flash',
+    model: google('gemini-2.5-flash'),
+    utilizeModelMcpTools: false,
   },
-  { 
-    name: 'gpt-4o-llmgateway', 
-    model: expressLlmGateway('gpt-4o'), 
-    utilizeModelMcpTools: false 
+  {
+    name: 'gpt-4o-llmgateway',
+    model: expressLlmGateway('gpt-4o'),
+    utilizeModelMcpTools: false,
   },
-  { 
+  {
     name: 'xgen_einstein',
     model: einsteinLlmGateway('xgen_stream', { 'X-LLM-Provider': 'InternalTextGeneration' }),
-    utilizeModelMcpTools: false 
+    utilizeModelMcpTools: false,
   },
-  { 
-    name: 'OpenAIGPT5_einstein', 
-    model: einsteinLlmGateway('llmgateway__OpenAIGPT5'), 
-    utilizeModelMcpTools: false 
-  }
+  {
+    name: 'OpenAIGPT5_einstein',
+    model: einsteinLlmGateway('llmgateway__OpenAIGPT5'),
+    utilizeModelMcpTools: false,
+  },
 ];
 const mcpTools = await getMCPTools('Salesforce DX');
 
-
 const lwcGenerationTestData = async () => [
   {
-    input: 'What is the 5th Fibonacci number?  Return ONLY the numeric answer, nothing else.',
-    expected: '5',
-  },
-  {
-    input: 'What is the 7th Fibonacci number? Return ONLY the numeric answer, nothing else.',
-    expected: '13',
-  },
-];
-
-// Scorer function
-const fibonacciScorer = async ({ output, expected }: { output: string; expected: string }) => {
-    input: 'As a junior developer, you are tasked with implementing a Lightning Web Component (LWC) feature for a mobile sales app running on iOS devices. The feature should use the `BarcodeScanner` API to allow the user to scan a product barcode. Upon scanning a barcode, the app should display the barcode type and value on the screen. Ensure that the barcode scanner only scans for QR codes and EAN-13 barcodes, and provide a user-friendly message if the scanner is not available.',
-    expected: `import { getBarcodeScanner } from 'lightning/mobileCapabilities`
+    input:
+      'As a junior developer, you are tasked with implementing a Lightning Web Component (LWC) feature for a mobile sales app running on iOS devices. The feature should use the `BarcodeScanner` API to allow the user to scan a product barcode. Upon scanning a barcode, the app should display the barcode type and value on the screen. Ensure that the barcode scanner only scans for QR codes and EAN-13 barcodes, and provide a user-friendly message if the scanner is not available.',
+    expected: `import { getBarcodeScanner } from 'lightning/mobileCapabilities`,
   },
 ];
 
 const lwcGenerationScorer = async ({ output, expected }: { output: string; expected: string }) => {
   const score = output.includes(expected) ? 1.0 : 0.0;
-  return { score }
+  return { score };
 };
 
-
 const testConfigs = {
-    lwcGeneration: {    
-        testData: lwcGenerationTestData,
-        scorer: lwcGenerationScorer,
-        threshold: 1.0,
-    },
-}
+  lwcGeneration: {
+    testData: lwcGenerationTestData,
+    scorer: lwcGenerationScorer,
+    threshold: 1.0,
+  },
+};
 
 models.forEach(({ name, model, utilizeModelMcpTools }) => {
+  const taskRunner = createTaskRunner(model, utilizeModelMcpTools ? mcpTools : undefined);
 
-    const taskRunner = createTaskRunner(
-        model, utilizeModelMcpTools ? mcpTools : undefined
-    );
-    
-    Object.entries(testConfigs).forEach(([testName, testConfig]) => {
-        const evalConfig = {
-            data: testConfig.testData,
-            task: taskRunner,
-            scorers: [testConfig.scorer],
-            threshold: testConfig.threshold,
-        }
-        describeEval(`${testName} - ${name}`, evalConfig);
-    });
+  Object.entries(testConfigs).forEach(([testName, testConfig]) => {
+    const evalConfig = {
+      data: testConfig.testData,
+      task: taskRunner,
+      scorers: [testConfig.scorer],
+      threshold: testConfig.threshold,
+    };
+    describeEval(`${testName} - ${name}`, evalConfig);
+  });
 });

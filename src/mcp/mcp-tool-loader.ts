@@ -23,22 +23,22 @@ interface MCPTool {
 }
 
 const mcpJson: MCPServersConfig = {
-    servers: {
-      'Salesforce DX': {
-        command: 'npx',
-        args: [
-          '-y',
-          '@salesforce/mcp',
-          '--orgs',
-          'DEFAULT_TARGET_ORG',
-          '--toolsets',
-          'mobile',
-          '--tools',
-          'run_apex_test',
-          '--allow-non-ga-tools',
-        ],
-      },
+  servers: {
+    'Salesforce DX': {
+      command: 'npx',
+      args: [
+        '-y',
+        '@salesforce/mcp',
+        '--orgs',
+        'DEFAULT_TARGET_ORG',
+        '--toolsets',
+        'mobile',
+        '--tools',
+        'run_apex_test',
+        '--allow-non-ga-tools',
+      ],
     },
+  },
 };
 
 /**
@@ -46,18 +46,16 @@ const mcpJson: MCPServersConfig = {
  * @param serverName - Name of the server to connect to (optional, uses first server if not specified)
  * @returns Promise<MCPTool[]> - List of available tools from the server
  */
-export async function getMCPTools(
-  serverName?: string
-): Promise<MCPTool[]> {
+export async function getMCPTools(serverName?: string): Promise<MCPTool[]> {
   // Get the server name - use provided one or first available
   const targetServerName = serverName || Object.keys(mcpJson.servers)[0];
-  
+
   if (!targetServerName) {
     throw new Error('No server specified and no servers available in config');
   }
 
   const serverConfig = mcpJson.servers[targetServerName];
-  
+
   if (!serverConfig) {
     throw new Error(`Server "${targetServerName}" not found in configuration`);
   }
@@ -78,7 +76,7 @@ export async function getMCPTools(
   const processEnv = Object.fromEntries(
     Object.entries(process.env).filter(([_, v]) => v !== undefined)
   ) as Record<string, string>;
-  
+
   const transport = new StdioClientTransport({
     command: serverConfig.command,
     args: serverConfig.args || [],
@@ -103,9 +101,9 @@ export async function getMCPTools(
 
     // List available tools
     const response = await client.listTools();
-    
+
     console.log(`Found ${response.tools.length} tools from server "${targetServerName}"`);
-    
+
     // Map the tools to a simpler format
     const tools: MCPTool[] = response.tools.map((tool) => ({
       name: tool.name,
@@ -115,7 +113,7 @@ export async function getMCPTools(
 
     // Clean up
     await client.close();
-    
+
     return tools;
   } catch (error) {
     // Ensure client is closed even on error
@@ -124,9 +122,7 @@ export async function getMCPTools(
     } catch (closeError) {
       // Ignore close errors
     }
-    
+
     throw error;
   }
 }
-
-

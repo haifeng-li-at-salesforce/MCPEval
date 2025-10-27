@@ -5,7 +5,7 @@ import { ToolDiscoveryAgent } from './tool-discovery-agent';
 import { expressLlmGateway } from '../clients/llm-gateways';
 
 export async function toolDiscoveryWorkflow(): Promise<boolean> {
-  const aiClient = new EinsteinDevModelClient(EinsteinDevModel.GPT5);
+  const aiClient = new EinsteinDevModelClient(EinsteinDevModel.XGEN);
   const discoveryAgent = new ToolDiscoveryAgent({
     codingModel: aiClient,
     judgeModel: expressLlmGateway('gpt-4o'),
