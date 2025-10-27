@@ -3,6 +3,7 @@
 import { createOpenAI } from '@ai-sdk/openai';
 import { LanguageModel } from 'ai';
 import * as dotenv from 'dotenv';
+import { createParser, EventSourceMessage } from 'eventsource-parser';
 
 dotenv.config();
 
@@ -37,8 +38,9 @@ export function einsteinLlmGateway(
             })),
             generation_settings: {
               // max_tokens: 2048,
-              // parameters: {
-              // },
+              parameters: {
+                // command_source: 'Chat',
+              },
             },
           }),
         }
@@ -46,32 +48,13 @@ export function einsteinLlmGateway(
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Einstein API error: ${response.statusText} - ${errorText}`);
+        throw new Error(`Einstein API error: ${response.status} - ${errorText}`);
       }
 
-      // Parse SSE response
-      const text = await response.text();
-      const lines = text.split('\n');
-      let textContent: string[] = [];
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          try {
-            const jsonData = JSON.parse(line.substring(6));
-            // Einstein API returns the full content in each chunk, not deltas
-            const content: string | undefined =
-              jsonData.generation_details?.generations?.[0]?.content;
-            if (typeof content === 'string' && content.length > 0) {
-              textContent.push(content); // Use the latest non-empty content
-            }
-          } catch (e) {
-            // Ignore parsing errors for non-JSON lines
-          }
-        }
-      }
+      const text = await getResponseText(response);
 
       return {
-        content: [{ type: 'text', text: textContent.join('') }],
+        content: [{ type: 'text', text }],
         finishReason: 'stop',
         usage: {
           inputTokens: undefined,
@@ -85,4 +68,50 @@ export function einsteinLlmGateway(
     modelId: modelName,
     defaultObjectGenerationMode: 'json',
   } as any;
+
+  async function getResponseText(response: Response): Promise<string> {
+    const textContent: string[] = [];
+
+    // Create a parser to process SSE events
+    const parser = createParser({
+      onEvent: (event: EventSourceMessage) => {
+        if (event.event === 'error') {
+          throw new Error(`Einstein API error: ${event.data}`);
+        }
+        if (event.event === 'generation' && event.data !== '[DONE]') {
+          const jsonData = JSON.parse(event.data);
+
+          const content: string | undefined =
+            jsonData.generation_details?.generations?.[0]?.content;
+          if (typeof content === 'string' && content.length > 0) {
+            textContent.push(content);
+          }
+        }
+      },
+      onError: (error: Error) => {
+        throw error;
+      },
+    });
+
+    // Read the response body stream and feed it to the parser
+    if (response.body) {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          parser.feed(chunk);
+        }
+      } finally {
+        reader.releaseLock();
+      }
+    }
+
+    const text = textContent.join('');
+    return text;
+  }
 }
