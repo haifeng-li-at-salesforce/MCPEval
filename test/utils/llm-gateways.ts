@@ -81,7 +81,7 @@ export function einsteinLlmGateway(
         }
         if (event.event === 'generation' && event.data !== '[DONE]') {
           const jsonData = JSON.parse(event.data);
-          // Einstein API returns the full content in each chunk, not deltas
+
           const content: string | undefined =
             jsonData.generation_details?.generations?.[0]?.content;
           if (typeof content === 'string' && content.length > 0) {

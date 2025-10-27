@@ -3,19 +3,20 @@ import { generateText, LanguageModel } from "ai";
 
 
 
-export function createTaskRunner(model: LanguageModel) {
+export function createTaskRunner(model: LanguageModel, tools?: any) {
     return async (input: string): Promise<TaskResult> => {
 
         const { text } = await generateText({
             model,
-            prompt: input
+            prompt: input,
+            tools: tools || undefined,
+            toolChoice: 'auto',
         });
         
         const result = text.trim();
         return {
-            result: `The Fibonacci number is ${result}`,
+            result: result,  // Return the actual result, not hardcoded message
         };
-        
     }
 }
   
