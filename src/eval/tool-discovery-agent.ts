@@ -3,14 +3,16 @@ import { z } from 'zod';
 import { generateObject, type LanguageModel } from 'ai';
 import { en } from 'zod/v4/locales';
 import { ModelMessage } from '../clients/streaming-request';
+import { type ToolCall } from 'vitest-evals';
 
 const A4V_URGENT_PROMPT = `
 [ERROR] You did not use a tool in your previous response! Please retry with a tool use.\n\n# Reminder: Instructions for Tool Use\n\nTool uses are formatted using XML-style tags. The tool name is enclosed in opening and closing tags, and each parameter is similarly enclosed within its own set of tags. Here's the structure:\n\n<tool_name>\n<parameter1_name>value1</parameter1_name>\n<parameter2_name>value2</parameter2_name>\n...\n</tool_name>\n\nFor example:\n\n<attempt_completion>\n<result>\nI have completed the task...\n</result>\n</attempt_completion>\n\nAlways adhere to this format for all tool uses to ensure proper parsing and execution.\n\n# Next Steps\n\nIf you have completed the user's task, use the attempt_completion tool.\nIf you require additional information from the user, use the ask_followup_question tool.\nOtherwise, if you have not completed the task and do not need additional information, then proceed with the next step of the task.\n(This is an automated message, so do not respond to it conversationally.)\n`;
 
+// Vitest-eval compatible tool call schema
 const TOOL_SCHEMA_FLEXIBLE = z.object({
   name: z.string(),
-  params: z.any(), // Accepts any value: object, array, string, number, etc.
-});
+  arguments: z.record(z.any()).optional(),// Accepts any value: object, array, string, number, etc.
+}).describe('The tool invocation message that the model should invoke.');
 
 // Solution 3: Generic function to create tool schema with specific param schema
 function createToolSchema<TParams extends z.ZodTypeAny>(paramSchema: TParams) {
@@ -61,8 +63,15 @@ export const ToolCallEvalSchema = z.object({
        [write_to_file for="force-app/main/default/lwc/mobileBarcodeScanner/mobileBarcodeScanner.js"] Result: The file is written successfully.
        `
     ),
+    toolInvocation: TOOL_SCHEMA_FLEXIBLE.optional().describe('The tool invocation message that the model should invoke.'),
 });
 
+
+export type ToolDiscoveryResult = {
+  success: boolean;
+  toolCall?: ToolCall;
+
+}
 export class ToolDiscoveryAgent {
   private codingModel: ModelClient;
   private judgeModel: LanguageModel; // LanguageModel type causes deep instantiation
@@ -82,7 +91,7 @@ export class ToolDiscoveryAgent {
     userPrompt: string,
     toolName: string,
     enableA4VSetting: boolean = false
-  ): Promise<boolean> {
+  ): Promise<ToolDiscoveryResult> {
     const inputMessages = [
       { role: 'system', content: this.systemPrompt },
       { role: 'user', content: userPrompt },
@@ -131,7 +140,14 @@ export class ToolDiscoveryAgent {
     if (!judgementResponse) {
       throw new Error('Judgement response is null');
     }
-    return judgementResponse.nextAction === 'success';
+
+    if (judgementResponse.nextAction === 'success') {
+      console.log('🔍 Tool invocation message:', JSON.stringify(judgementResponse.toolInvocation, null, 2));
+    }
+    return {
+      success: judgementResponse.nextAction === 'success',
+      toolCall: judgementResponse.toolInvocation,
+    };
   }
 
   private getJudgePrompt(toolName: string, content: string): string {
@@ -170,6 +186,17 @@ export class ToolDiscoveryAgent {
        Then the suggested follow-up message should be:
        <create_mobile_lwc_barcode_scanner Result: The LWC component is created successfully.>
 
-`;
+;
+5. If the next action is success, convert the model’s XML output into a JSON-formatted tool invocation message representing the tool the model should call while skipping the server_name field. For example, if the model’s XML output is:
+      <use_mcp_tool>
+       <server_name>salesforce</server_name>
+       <tool_name>create_mobile_lwc_barcode_scanner</tool_name>
+       <arguments>
+         <path>force-app/main/default/lwc/mobileBarcodeScanner/mobileBarcodeScanner.js</path>
+       </arguments>
+      </use_mcp_tool>
+    Then the suggested tool invocation message should be:
+     {"name": "create_mobile_lwc_barcode_scanner", "arguments": {"path": "force-app/main/default/lwc/mobileBarcodeScanner/mobileBarcodeScanner.js"}}
+`
   }
 }

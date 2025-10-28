@@ -3,6 +3,7 @@ import { testAiClient } from './utils/ai-client';
 import { LLMExpressModel, EinsteinDevModel, QWEN_CONFIG } from './model/model-configs';
 import { testLLMExpressModelClient } from './clients/chatcompletion-client';
 import { toolDiscoveryWorkflow } from './eval/tool-discovery-workflow';
+import { barcodePrompt } from './prompts/constant';
 
 // Export MCP tool loader
 export { getMCPTools } from './mcp/mcp-tool-loader';
@@ -12,7 +13,7 @@ export { getMCPTools } from './mcp/mcp-tool-loader';
 async function main() {
   //testStreamingClient(QWEN_CONFIG);
   //await testAiClient();
-  await toolDiscoveryWorkflow();
+  await toolDiscoveryWorkflow(EinsteinDevModel.XGEN, barcodePrompt, 'create_mobile_lwc_barcode_scanner');
   //testLLMExpressModelClient(LLMExpressModel.GEMINI_2_5_FLASH);
 }
 

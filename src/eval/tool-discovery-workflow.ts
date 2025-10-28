@@ -1,11 +1,11 @@
 import { EinsteinDevModel } from '../model/model-configs';
 import { EinsteinDevModelClient } from '../clients/streaming-client';
 import { systemPrompt_V2, barcodePrompt } from '../prompts/constant';
-import { ToolDiscoveryAgent } from './tool-discovery-agent';
-import { expressLlmGateway } from '../clients/llm-gateways';
+import { ToolDiscoveryAgent, ToolDiscoveryResult } from './tool-discovery-agent';
+import { expressLlmGateway } from '../ai-sdk/llm-gateways';
 
-export async function toolDiscoveryWorkflow(): Promise<boolean> {
-  const aiClient = new EinsteinDevModelClient(EinsteinDevModel.XGEN);
+export async function toolDiscoveryWorkflow(model: EinsteinDevModel, userPrompt: string, targetToolName: string): Promise<ToolDiscoveryResult> {
+  const aiClient = new EinsteinDevModelClient(model);
   const discoveryAgent = new ToolDiscoveryAgent({
     codingModel: aiClient,
     judgeModel: expressLlmGateway('gpt-4o'),
@@ -14,13 +14,16 @@ export async function toolDiscoveryWorkflow(): Promise<boolean> {
   });
 
   const result = await discoveryAgent.discover(
-    barcodePrompt,
-    'create_mobile_lwc_barcode_scanner',
+    userPrompt,
+    targetToolName,
     true
   );
   console.log('AI Model tool invocation result:', result ? 'Success' : 'Failed');
+  
+  return result;
+  
 
   // const response = await aiClient.chat([{ role: 'system', content: systemPrompt }, { role: 'user', content: barcodePrompt }]);
   // console.log(response);
-  return false;
+  //return false;
 }
