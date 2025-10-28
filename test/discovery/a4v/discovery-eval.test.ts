@@ -1,8 +1,9 @@
-import { describeEval, ToolCallScorer } from 'vitest-evals';
+import { describeEval, ToolCallScorer, TaskResult } from 'vitest-evals';
 import { barcodePrompt } from '../../../src/prompts/constant';
 import { EinsteinDevModel } from '../../../src/model/model-configs';
 import { toolDiscoveryWorkflow } from '../../../src/eval/tool-discovery-workflow';
 const testModel = EinsteinDevModel.XGEN;
+const toolName = 'create_mobile_lwc_barcode_scanner';
 
 describeEval('A4V mobile mcp tool discovery', {
     data: async () => [
@@ -10,20 +11,14 @@ describeEval('A4V mobile mcp tool discovery', {
             input: barcodePrompt,
             expectedTools: [
                 {
-                    name: 'create_mobile_lwc_barcode_scanner',
+                    name: toolName,
                     arguments: {
                     },
                 },
             ],
         },
     ],
-    task: async ( input ) => {
-        const evalResult = await toolDiscoveryWorkflow(testModel, input, 'create_mobile_lwc_barcode_scanner');
-        return {
-            result: evalResult.success ? "invoked" : "not invoked",
-            toolCalls: evalResult.toolCall ? [evalResult.toolCall] : [],
-        };
-    },
+    task: toolDiscoveryTask(testModel, toolName),
     scorers: [
         ToolCallScorer({
             params: "fuzzy",
@@ -34,3 +29,13 @@ describeEval('A4V mobile mcp tool discovery', {
     ]
     
 });
+
+function toolDiscoveryTask(model: EinsteinDevModel, toolName: string) {
+    return async function(input: string): Promise<TaskResult> {
+        const evalResult = await toolDiscoveryWorkflow(model, input, toolName);
+        return {
+            result: evalResult.success ? "invoked" : "not invoked",
+            toolCalls: evalResult.toolCall ? [evalResult.toolCall] : [],
+        };
+    }
+}
