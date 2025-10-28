@@ -13,7 +13,11 @@ export { getMCPTools } from './mcp/mcp-tool-loader';
 async function main() {
   //testStreamingClient(QWEN_CONFIG);
   //await testAiClient();
-  await toolDiscoveryWorkflow(EinsteinDevModel.XGEN, barcodePrompt, 'create_mobile_lwc_barcode_scanner');
+  await toolDiscoveryWorkflow(
+    EinsteinDevModel.XGEN,
+    barcodePrompt,
+    'create_mobile_lwc_barcode_scanner'
+  );
   //testLLMExpressModelClient(LLMExpressModel.GEMINI_2_5_FLASH);
 }
 
